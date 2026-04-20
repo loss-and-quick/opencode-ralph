@@ -1,3 +1,5 @@
 node_modules/
 .logs/
+.opencode/
+!.opencode/opencode.json
 ralph-loop.local.md
