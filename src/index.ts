@@ -1,5 +1,5 @@
 import type { Plugin } from "@opencode-ai/plugin"
-import { existsSync, readFileSync, writeFileSync, unlinkSync, mkdirSync } from "fs"
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from "fs"
 import { join } from "path"
 
 /**
@@ -130,35 +130,25 @@ const server: Plugin = async ({ directory, client, $ }) => {
       // We need to check if the completion promise was output
       if (state.completionPromise) {
         try {
-          // Use the SDK to get session messages
-          const session = await client.session.get({ id: event.properties.sessionID })
-          if (session.messages && session.messages.length > 0) {
-            // Find the last assistant message
-            const lastAssistantMsg = [...session.messages]
-              .reverse()
-              .find((m) => m.role === "assistant")
-
-            if (lastAssistantMsg) {
-              // Extract text content from message parts
-              const textContent = lastAssistantMsg.parts
-                ?.filter((p: any) => p.type === "text")
-                .map((p: any) => p.text)
-                .join("\n")
-
-              if (textContent && checkCompletionPromise(textContent, state.completionPromise)) {
-                // Completion promise detected - stop the loop
-                deleteRalphState(directory)
-                await client.app.log({
-                  service: "ralph-plugin",
-                  level: "info",
-                  message: `Ralph loop completed: detected <promise>${state.completionPromise}</promise>`,
-                })
-                return
-              }
+          const result = await client.session.messages({ path: { id: event.properties.sessionID } })
+          const messages = result.data ?? []
+          const lastAssistantMsg = [...messages].reverse().find((m: any) => m.role === "assistant")
+          if (lastAssistantMsg) {
+            const textContent = (lastAssistantMsg.parts ?? [])
+              .filter((p: any) => p.type === "text")
+              .map((p: any) => p.text)
+              .join("\n")
+            if (textContent && checkCompletionPromise(textContent, state.completionPromise)) {
+              deleteRalphState(directory)
+              await client.app.log({
+                service: "ralph-plugin",
+                level: "info",
+                message: `Ralph loop completed: detected <promise>${state.completionPromise}</promise>`,
+              })
+              return
             }
           }
         } catch (err) {
-          // If we can't check messages, continue the loop
           await client.app.log({
             service: "ralph-plugin",
             level: "warn",
@@ -206,10 +196,10 @@ const server: Plugin = async ({ directory, client, $ }) => {
       // The prompt includes a marker showing the iteration
       const continuationPrompt = `[${systemMsg}]\n\n${state.prompt}`
 
-      // Use session.send to continue the conversation
-      await client.session.send({
-        id: event.properties.sessionID,
-        text: continuationPrompt,
+      // Use session.prompt to continue the conversation
+      await client.session.prompt({
+        path: { id: event.properties.sessionID },
+        body: { parts: [{ type: "text", text: continuationPrompt }] },
       })
     },
   }
