@@ -1,0 +1,19 @@
+{
+  "name": "@loss-and-quick/opencode-ralph",
+  "version": "1.0.0",
+  "description": "Ralph Wiggum iterative loop plugin for OpenCode",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/index.ts"
+  },
+  "keywords": ["opencode", "plugin", "ralph", "loop", "iterative"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loss-and-quick/opencode-ralph.git"
+  },
+  "peerDependencies": {
+    "@opencode-ai/plugin": "*"
+  }
+}

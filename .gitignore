@@ -1,2 +1,3 @@
-# Ralph loop state file (should not be committed)
+node_modules/
+.logs/
 ralph-loop.local.md
