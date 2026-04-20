@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "types": ["bun-types"],
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true
+  },
+  "include": ["src"]
+}

@@ -46,7 +46,7 @@ Start a Ralph loop in your current session.
 - `--completion-promise <text>` - Promise phrase to signal completion
 
 **How it works:**
-1. Creates `.opencode/ralph-loop.local.md` state file
+1. Creates `ralph-loop.local.md` state file in project root
 2. You work on the task
 3. When you finish responding, the plugin intercepts
 4. Same prompt fed back
@@ -66,7 +66,7 @@ Cancel an active Ralph loop (removes the loop state file).
 
 **How it works:**
 - Checks for active loop state file
-- Removes `.opencode/ralph-loop.local.md`
+- Removes `ralph-loop.local.md`
 - Reports cancellation with iteration count
 
 ---

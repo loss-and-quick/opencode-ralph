@@ -13,6 +13,9 @@
     "type": "git",
     "url": "git+https://github.com/loss-and-quick/opencode-ralph.git"
   },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
   "peerDependencies": {
     "@opencode-ai/plugin": "*"
   }

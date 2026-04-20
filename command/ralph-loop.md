@@ -12,21 +12,24 @@ Execute the following steps to initialize the Ralph loop:
 
 1. Parse the arguments from: `$ARGUMENTS`
 
-   Arguments format: `<PROMPT> [--max-iterations N] [--completion-promise TEXT]`
+   Arguments format: `<PROMPT> [--max-iterations N] [--completion-promise TEXT] [--git-commit]`
 
    - Extract the main prompt (everything that isn't a flag or flag value)
    - Extract `--max-iterations` value if provided (default: 0 for unlimited)
    - Extract `--completion-promise` value if provided (default: null)
+   - Extract `--git-commit` flag if present (default: false) - auto-commits after each iteration
 
 2. Create the state file at `ralph-loop.local.md` (in the project root) with this exact format:
 
 ```markdown
 ---
 active: true
+paused: false
 iteration: 1
 max_iterations: <MAX_ITERATIONS_VALUE>
 completion_promise: <COMPLETION_PROMISE_VALUE_OR_null>
 started_at: "<CURRENT_ISO_TIMESTAMP>"
+git_commit: <true_if_--git-commit_flag_present_else_false>
 ---
 
 <THE_PROMPT_TEXT>
@@ -48,6 +51,7 @@ To stop the loop:
 - Output <promise>YOUR_PROMISE</promise> if a completion promise is set
 - Wait for max iterations to be reached
 - Run /cancel-ralph to cancel manually
+- Set `paused: true` in `ralph-loop.local.md` to pause without cancelling
 ```
 
 4. If a completion promise is set, display this critical warning:
@@ -75,6 +79,6 @@ promise is GENUINELY TRUE.
 
 ```
 /ralph-loop Build a REST API for todos --completion-promise "DONE" --max-iterations 20
-/ralph-loop Fix the auth bug --max-iterations 10
+/ralph-loop Fix the auth bug --max-iterations 10 --git-commit
 /ralph-loop Refactor the cache layer
 ```
