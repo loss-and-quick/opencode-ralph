@@ -1,6 +1,9 @@
 import type { Plugin } from "@opencode-ai/plugin"
-import { unlink } from "node:fs/promises"
-import { join } from "path"
+import { unlink, readFile } from "node:fs/promises"
+import { join, dirname } from "path"
+import { fileURLToPath } from "url"
+
+const COMMANDS_DIR = join(dirname(fileURLToPath(import.meta.url)), "../command")
 
 const STATE_FILE = "ralph-loop.local.md"
 
@@ -73,6 +76,22 @@ function checkCompletionPromise(text: string, promise: string): boolean {
 
 const server: Plugin = async ({ directory, client, $ }) => {
   return {
+    config: async (cfg) => {
+      cfg.command ??= {}
+      for (const [name, file] of [
+        ["ralph-loop", "ralph-loop.md"],
+        ["cancel-ralph", "cancel-ralph.md"],
+        ["ralph-help", "ralph-help.md"],
+      ] as const) {
+        const raw = await readFile(join(COMMANDS_DIR, file), "utf-8")
+        const match = raw.match(/^---\n[\s\S]*?\n---\n([\s\S]*)$/)
+        const descMatch = raw.match(/^description:\s*(.+)$/m)
+        cfg.command[name] = {
+          template: match ? match[1].trim() : raw.trim(),
+          description: descMatch?.[1]?.trim(),
+        }
+      }
+    },
     event: async ({ event }) => {
       if (event.type !== "session.idle") return
 
